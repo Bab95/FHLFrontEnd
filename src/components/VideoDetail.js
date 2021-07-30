@@ -2,9 +2,11 @@ import React from "react";
 import Youtube from 'react-youtube';
 import MContext from './ContextProvider'
 import {useEffect, useState} from "react/cjs/react.production.min";
-
+import axios from "axios";
+const endpoint = "http://localhost:8080";
+let startNoteTime = "";
+let ytplayer = null;
 const VideoDetail = ({ video }) => {
-
 //function VideoDetail({video}) {
   if (!video) {
     return <div>
@@ -19,7 +21,7 @@ const VideoDetail = ({ video }) => {
     </div>;
   }
     //const [ytplayer,setYtplayer] = useState(null);
-    let ytplayer = null;
+
     const videoSrc = `https://www.youtube.com/embed/${video.id.videoId}`;
     const opts = {
         height: 390,
@@ -30,10 +32,10 @@ const VideoDetail = ({ video }) => {
     };
 
     function _onReady(event){
-
+        startNoteTime = "";
         let time = event.target.getCurrentTime();
         console.log("The time is ::::: " + time);
-        event.target.pauseVideo();
+        event.target.playVideo();
         ytplayer = event.target;
     }
     const onPlayVideo = () => {
@@ -59,6 +61,7 @@ const VideoDetail = ({ video }) => {
         let minutes = Math.floor(time/60);
         let seconds = time%60;
         let notesArea = document.getElementById("notes-area").style.display='block'
+        startNoteTime = time;
     }
     const postDate = async (e) => {
         e.preventDefault();
@@ -85,15 +88,52 @@ const VideoDetail = ({ video }) => {
          }
 
     }
+    const addTodb = async (notesdata) => {
+        let config = {
+            headers: {
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': 'http://localhost:8080',
+            }
+        }
+        const response = await axios.post(endpoint + '/items', notesdata, config);
+        if(response.status === 200 || response.status===201){
+            console.log("data added to db");
+        }
+    }
+    const fetchNotes = async () => {
+        const {data, status} = await axios.get(endpoint + '/items');
+        if(status === 200){
 
-    function _saveNotes(event){
+        }else{
+            console.log("ERROR in fetching");
+        }
+    }
+    async function _saveNotes(event){
         let notes = document.getElementById("notes-area").value;
         let time = ytplayer.getCurrentTime();
         let minutes = Math.floor(time/60);
         let seconds = time%60;
         let id = video.id.videoId;
         console.log(id);
+        const noteTime = startNoteTime - time;
+        const notesdata = {
+            id : id,
+            starttime : startNoteTime,
+            duration : noteTime,
+            note : notes
+        };
         //add to db here.......
+        let config = {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            }
+        }
+        const response = await axios.post(endpoint + '/items', notesdata, config);
+        if(response.status === 200 || response.status===201){
+            console.log("data added to db");
+        }
+
     }
     function handleOnChange(event){
         let savebutton = document.getElementById("savebutton");
