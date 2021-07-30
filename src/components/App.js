@@ -8,12 +8,14 @@ import ContextProvider from "./ContextProvider";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-
+import NotesList from "./NotesList";
+import axios from "axios";
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 2,
   },
 }));
+const apiEndpoint = "http://localhost:8080";
 
 class App extends React.Component {
   // const tag = document.createElement("script");
@@ -21,101 +23,11 @@ class App extends React.Component {
 
   state = {
     videos: [],
+    notes:[],
     selectedVideo: null,
+    selectedNote: null,
+    forceSeekTime: 0
   };
-  /*
-    callbackFunction = (ytplayer) => {
-        this.setState({player:ytplayer})
-    }
-    /*
-    componentDidMount() {
-        /*
-        var tag = document.createElement("script");
-        tag.src = "https://www.youtube.com/iframe_api";
-        tag.setAttribute("onload", "onYouTubeIframeReady()");
-        var firstScriptTag = document.getElementsByTagName("script")[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        // var setPlayer;
-        tag.onload = setupPlayer;
-        */
-  /*
-        console.log("Component did mount");
-        this.loadVideo();
-
-    }
-
-    loadVideo = () => {
-        let localplayer = null;
-        console.info(`loadVideo called`);
-
-        (function loadYoutubeIFrameApiScript() {
-            const tag = document.createElement("script");
-            tag.src = "https://www.youtube.com/iframe_api";
-
-            const firstScriptTag = document.getElementsByTagName("script")[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            tag.onload = setupPlayer;
-        })();
-
-
-        function setupPlayer() {
-            window.YT.ready(function() {
-                localplayer = new window.YT.Player("player", {
-                    height: "390",
-                    width: "640",
-                    videoId: "M7lc1UVf-VE",
-                    events: {
-                        onReady: onPlayerReady,
-                        onStateChange: onPlayerStateChange
-                    }
-                });
-
-                if(localplayer===null) {
-                    console.log("localplayer is null;;;");
-                }else{
-                    console.log("Here it has a value");
-                }
-                if(localplayer!=null){
-                    this.setState({player:localplayer});
-                }
-
-
-            });
-
-            if(localplayer!=null) {
-                console.log(localplayer.toString());
-            }else{
-                console.log("why is local player null!");
-            }
-            console.log(this.toString());
-
-            this.setState({
-                    player: localplayer
-                }
-            );
-        }
-
-        this.setState({
-                player: localplayer
-            }
-        );
-
-        function getTime(){
-            let time = this.state.player.getCurrentTime();
-            console.log("time is" + time);
-        }
-
-        function onPlayerReady(event) {
-            event.target.playVideo();
-        }
-
-        function onPlayerStateChange(event) {
-            var videoStatuses = Object.entries(window.YT.PlayerState);
-            console.log(videoStatuses.find(status => status[1] === event.data)[0]);
-        }
-    }
-
-    */
 
   handleSubmit = async (termFromSearchBar) => {
     const response = await youtube.get("/search", {
@@ -129,7 +41,35 @@ class App extends React.Component {
     });
     console.log("this is resp", response);
   };
-  handleVideoSelect = (video) => {
+  getNotes = async (videoId) => {
+    try {
+      const response = await axios.get(apiEndpoint + `/items/${videoId}`);
+      if (response.status === 200) {
+        console.log("successfully got notes from db");
+        const _data = response.data;
+        const modifiedNotes = [
+          {
+            id: "56843",
+            note: _data.note,
+            starttime: _data.starttime
+          }
+        ];
+        return modifiedNotes;
+        /*
+          todo
+        let _notes = [];
+        for(let i=0;i<_data.note.length;i++){
+          _notes.push(_data.note[i])
+        }
+         */
+      } else {
+        console.log("Some error status != 200 in APP.js");
+      }
+    }catch(error){
+      console.log("Error in getting notes in APP.js");
+    }
+  }
+  handleVideoSelect = async (video) => {
     const _opts = {
       height: 390,
       width: 640,
@@ -138,34 +78,15 @@ class App extends React.Component {
       },
     };
     this.setState({ selectedVideo: video });
+    const _notes = await this.getNotes(video.id.videoId);
+    this.setState({notes:_notes});
   };
-
-  addNotes = (event) => {
-    /*
-        if (this.state.player === null){
-            console.log("WTF buddy!");
-            return;
-        }
-        console.log("AddComponent::addNotes");
-        var time = this.state.player.getCurrentTime();
-        console.log("time is:::"+ time)
-    */
-    var x = document.getElementsByClassName("youtube");
-    let time = x.getCurrentTime();
-    console.log(time);
-    //console.log(x);
-  };
-  _onReady = (event) => {
-    //player = event.target;
-    event.target.pauseVideo();
-  };
-
-  _getCurrentTime = (event) => {
-    var time = event.target.getCurrentTime();
-    console.log("Time in App component::::" + time);
+  handleNoteSelect = (note) => {
+    this.setState({selectedNote:note, forceSeekTime:Math.random() });
   };
 
   render() {
+    console.log("AppComponent rendered();");
     return (
       <div className={makeStyles.root}>
         <Grid container spacing={3}>
@@ -185,7 +106,7 @@ class App extends React.Component {
           <Grid item xs={7} style={{ marginLeft: "20px", marginRight: "20px" }}>
             <Paper style={{ padding: "10px" }}>
               {" "}
-              <VideoDetail video={this.state.selectedVideo} />
+              <VideoDetail video={this.state.selectedVideo} forceSeekTime={this.state.forceSeekTime} />
             </Paper>
           </Grid>
           <Grid item xs={4} style={{ marginLeft: "20px", marginRight: "20px" }}>
@@ -196,6 +117,15 @@ class App extends React.Component {
               />
             </Paper>
           </Grid>
+          <Grid item xs={4} style={{ marginLeft: "20px", marginRight: "20px" }}>
+            <Paper style={{ padding: "10px" }}>
+              <NotesList
+                  handleNoteSelect={this.handleNoteSelect}
+                  notes={this.state.notes}
+              />
+            </Paper>
+          </Grid>
+
         </Grid>
       </div>
 

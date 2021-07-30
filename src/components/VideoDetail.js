@@ -13,7 +13,8 @@ const textAreaStyle = {
 const hideStyle = {
     display: 'none'
 }
-const VideoDetail = ({ video }) => {
+let startTime = 0;
+const VideoDetail = ({ video, forceSeekTime }) => {
 //function VideoDetail({video}) {
     if (!video) {
 
@@ -46,24 +47,30 @@ const VideoDetail = ({ video }) => {
         );
 
     }
+    if(forceSeekTime) {
+        startTime += forceSeekTime;
+        startTime += 100;
+    }
     const videoSrc = `https://www.youtube.com/embed/${video.id.videoId}`;
     const opts = {
         height: 390,
         width: 640,
         playerVars: {
-            autoplay: 1
+            autoplay: 1,
+            start: startTime
         },
     };
 
     function _onReady(event){
+        console.log("_onReadyCalled!");
         startNoteTime = "";
         let time = event.target.getCurrentTime();
         console.log("The time is ::::: " + time);
-        event.target.playVideo();
         ytplayer = event.target;
+        event.target.seekTo(startTime);
     }
-    const onPlayVideo = () => {
-        ytplayer.playVideo();
+    const onPlayVideo = (event) => {
+        event.target.playVideo();
     }
     function _getCurrentTime(event){
 
@@ -113,7 +120,6 @@ const VideoDetail = ({ video }) => {
                 _notesString += data[i].note;
                 _notesString += '\n';
             }
-            document.getElementById("sparaegaph").innerText = _notesString;
         }else{
             console.log("ERROR in fetching");
         }
@@ -157,6 +163,10 @@ const VideoDetail = ({ video }) => {
             console.log(error.toString());
         }
     }
+    function _forceSeek(){
+        console.log("ForceSeek Called yay!!!");
+        ytplayer.seekTo(startTime, true);
+    }
     function handleOnChange(event){
         console.log("dumps::VideoDetails::handleOnChange");
         let savebutton = document.getElementById("savebutton");
@@ -168,32 +178,11 @@ const VideoDetail = ({ video }) => {
             savebutton.style.display = 'block';
         }
     }
+
     let player = null;
     console.log(typeof video);
+    console.log("Force SeekTime::" + startTime);
     return (
-        /*
-        <div>
-            <div className="ui embed">
-                <Youtube className = "youtube" videoId={video.id.videoId} opts={opts} onReady={_onReady} onPause={_getCurrentTime} />
-            </div>
-            <div style={{marginTop: '1em'}}>
-                <button onClick={_addNotes} style={{margin:'1em'}}>[AddNotes]</button>
-                <button id="savebutton" onClick={_saveNotes} style={{display:'none',margin:'1em'}}>SaveNotes</button>
-                <button id={"shownotes"} onClick={fetchNotes} style={{margin:'1em'}}>Show notes</button>
-            </div>
-            <div className="ui segment">
-                <h4 className="ui header">{video.snippet.title}</h4>
-                <p>{video.snippet.description}</p>
-            </div>
-            <div className='search-bar ui segment'>
-                <input id="notes-area" onChange={handleOnChange} style={{display:'none'}}/>
-            </div>
-            <div id="oldNotes" style={{display:'none',margin:'1em'}}>
-                <p id="sparaegaph"></p>
-            </div>
-        </div>
-        */
-
         <div>
             <div className="ui embed">
                 <Youtube
@@ -201,6 +190,7 @@ const VideoDetail = ({ video }) => {
                     videoId={video.id.videoId}
                     opts={opts}
                     onReady={_onReady}
+                    onPlay={onPlayVideo}
                     onPause={_getCurrentTime}
                 />
             </div>
