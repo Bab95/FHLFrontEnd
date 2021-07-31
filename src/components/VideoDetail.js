@@ -6,7 +6,6 @@ import TextField from "@material-ui/core/TextField";
 const endpoint = "http://localhost:8080";
 let startNoteTime = "";
 let ytplayer = null;
-let showTextArea = null;
 const textAreaStyle = {
     width: '100%'
 };
@@ -61,32 +60,18 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
     };
 
     function _onReady(event){
-        console.log("_onReadyCalled!");
         startNoteTime = "";
         let time = event.target.getCurrentTime();
-        console.log("The time is ::::: " + time);
         ytplayer = event.target;
         event.target.seekTo(startTime);
     }
     const onPlayVideo = (event) => {
         event.target.playVideo();
     }
-    function _getCurrentTime(event){
-
-        let time = ytplayer.getCurrentTime();
-        let minutes = Math.floor(time/60);
-        let seconds = time%60;
-        console.log("Time::" + minutes + ":" + seconds);
-    }
     function _addNotes(event){
         let time = ytplayer.getCurrentTime();
-        let minutes = Math.floor(time/60);
-        let seconds = time%60;
-        showTextArea = true;
         startNoteTime = time;
-        console.log("dumps::VideoDetail::_addNotes:"+startNoteTime);
         //need to hide and make text area visible.....on click this
-        //forcererender this component
     }
     async function _saveNotes(event){
         let text = document.getElementById("notes-area").value;
@@ -100,7 +85,6 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
         let id = video.id.videoId;
         console.log(id);
         const noteTime = time - startNoteTime;
-        console.log("VideoDetailsDumps::::::NoteTime" + noteTime)
         const notesdatapayload = {
             "id" : id,
             "notes" : [
@@ -129,17 +113,17 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
         }
         document.getElementById("savebutton").style.display = 'none';
         document.getElementById("notes-area").value = '';
+        alert("Note saved successfully!");
         await handleAddNote();
     }
 
     function handleOnChange(event){
-        let savebutton = document.getElementById("savebutton");
         let notes = document.getElementById("notes-area").value;
         if(notes.value === ''){
             //as now change is not happening it's not being called anymore
-            savebutton.style.display = 'none';
+            document.getElementById("savebutton").style.display = 'none';
         }else{
-            savebutton.style.display = 'block';
+            document.getElementById("savebutton").style.display = 'block';
         }
     }
 
@@ -152,7 +136,6 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
                     opts={opts}
                     onReady={_onReady}
                     onPlay={onPlayVideo}
-                    onPause={_getCurrentTime}
                 />
             </div>
             <div style={{ marginTop: "1em" }}>

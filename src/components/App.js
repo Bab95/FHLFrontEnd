@@ -4,7 +4,6 @@ import youtube from "../apis/youtube";
 import VideoList from "./VideoList";
 import VideoDetail from "./VideoDetail";
 import NotesComponent from "./NotesComponent";
-import ContextProvider from "./ContextProvider";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
@@ -36,37 +35,13 @@ class App extends React.Component {
     this.setState({
       videos: response.data.items,
     });
-    console.log("this is resp", response);
+    //console.log("this is resp", response.data.items);
   };
   getNotes = async (videoId) => {
     try {
       const response = await axios.get(apiEndpoint + `/items/${videoId}`);
       if (response.status === 200) {
-        console.log("successfully got notes from db");
-        const _data = response.data;
-        console.log("getNotes::" + JSON.stringify(_data));
-        const notes = _data.notes;
-        console.log(notes);
-        /*
-        sample response.data
-        {
-          "id": "testid123",
-          "notes": [
-                {
-                  "noteId": "note1",
-                  "startTime": 56,
-                  "duration": 90,
-                  "note": "Hello this is first new text note"
-                },
-                {
-                  "noteId": "note2",
-                  "startTime": 56,
-                  "duration": 90,
-                  "note": "Hello this is second new text note"
-                }
-            ]
-        }
-        */
+        const notes = response.data.notes;
         return notes;
       } else {
         console.log("Some error status != 200 in APP.js" + response.status);
@@ -77,13 +52,6 @@ class App extends React.Component {
     }
   }
   handleVideoSelect = async (video) => {
-    const _opts = {
-      height: 390,
-      width: 640,
-      playerVars: {
-        autoplay: 1,
-      },
-    };
     this.setState({ selectedVideo: video });
     const _notes = await this.getNotes(video.id.videoId);
     if(_notes===null){
@@ -102,7 +70,6 @@ class App extends React.Component {
   }
 
   render() {
-   console.log("App component rerendered!!");
     return (
       <div className={makeStyles.root}>
         <Grid container spacing={3}>

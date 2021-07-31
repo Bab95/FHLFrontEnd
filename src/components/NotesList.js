@@ -10,7 +10,7 @@ const NotesList = ({ notes , handleNoteSelect}) => {
         );
     }
     const _notes = JSON.stringify(notes);
-    console.log("NotesListDumps::" + _notes);
+    //console.log("NotesListDumps::" + _notes);
     const renderedNotes =  notes.map((note) => {
         return <NotesComponent key={note.noteId} note={note} handleNoteSelect={handleNoteSelect} />
         // console.log(video.id);
