@@ -50,6 +50,7 @@ const VideoDetail = ({ video, forceSeekTime }) => {
     if(forceSeekTime) {
         startTime += forceSeekTime;
         startTime += 100;
+        console.log('ForceSeekTime recieved!!!' + forceSeekTime);
     }
     const videoSrc = `https://www.youtube.com/embed/${video.id.videoId}`;
     const opts = {
@@ -125,7 +126,11 @@ const VideoDetail = ({ video, forceSeekTime }) => {
         }
     }
     async function _saveNotes(event){
-        let notes = document.getElementById("notes-area").value;
+        let text = document.getElementById("notes-area").value;
+        if(text===''){
+            alert('Please write something!');
+            return;
+        }
         let time = ytplayer.getCurrentTime();
         let minutes = Math.floor(time/60);
         let seconds = time%60;
@@ -133,20 +138,26 @@ const VideoDetail = ({ video, forceSeekTime }) => {
         console.log(id);
         const noteTime = time - startNoteTime;
         console.log("VideoDetailsDumps::::::NoteTime" + noteTime)
-        const notesdata = {
-            id : id,
-            starttime : startNoteTime,
-            duration : noteTime,
-            note : notes
+        const notesdatapayload = {
+            "id" : id,
+            "notes" : [
+                {
+                    "noteId" : id + Math.random().toString(),
+                    "starttime" : startNoteTime,
+                    "duration" : noteTime,
+                    "note" : text
+                }
+            ]
         };
-        const notesdatajson = JSON.stringify(notesdata);
+        //const notesdatajson = JSON.stringify(notesdata);
+        /*
         let payload = {
             "id" : notesdata.id,
             "starttime" : notesdata.starttime,
             "duration" : notesdata.duration,
             "note" : notesdata.note
         }
-        console.log("VideoDetailsDumps::::::NoteTime"+ notesdatajson);
+        */
         //add to db here.......
         let config = {
             headers: {
@@ -155,7 +166,7 @@ const VideoDetail = ({ video, forceSeekTime }) => {
             }
         }
         try {
-            const response = await axios.post(endpoint + '/items', payload, config);
+            const response = await axios.post(endpoint + '/items', notesdatapayload, config);
             if (response.status === 200 || response.status === 201) {
                 console.log("data added to db");
             }
@@ -168,7 +179,6 @@ const VideoDetail = ({ video, forceSeekTime }) => {
         ytplayer.seekTo(startTime, true);
     }
     function handleOnChange(event){
-        console.log("dumps::VideoDetails::handleOnChange");
         let savebutton = document.getElementById("savebutton");
         let notes = document.getElementById("notes-area").value;
         if(notes.value === ''){
@@ -179,9 +189,6 @@ const VideoDetail = ({ video, forceSeekTime }) => {
         }
     }
 
-    let player = null;
-    console.log(typeof video);
-    console.log("Force SeekTime::" + startTime);
     return (
         <div>
             <div className="ui embed">

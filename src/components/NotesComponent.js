@@ -11,10 +11,16 @@ const NotesComponent = ({note, handleNoteSelect}) => {
             </div>
         );
     }
+    function convertToMinutes(time) {
+        let minutes = Math.floor(time/60);
+        let seconds = time%60;
+        return parseInt(minutes).toString().concat(':').concat(parseInt(seconds).toString());
+    }
+    console.log("NotesComponent:::" +JSON.stringify(note));
   //const NotesComponent = () => {
   return(
-      <div className="ui-embed" onClick={() => handleNoteSelect(note)}>
-        <p>{note.note}</p>
+      <div className="ui-embed" style={{margin:'1em'}} onClick={() => handleNoteSelect(note)}>
+        <p>{convertToMinutes(note.startTime)}::{note.note}</p>
       </div>
   );
 }

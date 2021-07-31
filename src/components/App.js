@@ -28,7 +28,6 @@ class App extends React.Component {
     selectedNote: null,
     forceSeekTime: 0
   };
-
   handleSubmit = async (termFromSearchBar) => {
     const response = await youtube.get("/search", {
       params: {
@@ -47,23 +46,33 @@ class App extends React.Component {
       if (response.status === 200) {
         console.log("successfully got notes from db");
         const _data = response.data;
-        const modifiedNotes = [
-          {
-            id: "56843",
-            note: _data.note,
-            starttime: _data.starttime
-          }
-        ];
-        return modifiedNotes;
+        console.log("getNotes::" + JSON.stringify(_data));
+        const notes = _data.notes;
+        console.log(notes);
         /*
-          todo
-        let _notes = [];
-        for(let i=0;i<_data.note.length;i++){
-          _notes.push(_data.note[i])
+        sample response.data
+        {
+          "id": "testid123",
+          "notes": [
+                {
+                  "noteId": "note1",
+                  "startTime": 56,
+                  "duration": 90,
+                  "note": "Hello this is first new text note"
+                },
+                {
+                  "noteId": "note2",
+                  "startTime": 56,
+                  "duration": 90,
+                  "note": "Hello this is second new text note"
+                }
+            ]
         }
-         */
+        */
+        return notes;
       } else {
-        console.log("Some error status != 200 in APP.js");
+        console.log("Some error status != 200 in APP.js" + response.status);
+        return null;
       }
     }catch(error){
       console.log("Error in getting notes in APP.js");
@@ -79,14 +88,19 @@ class App extends React.Component {
     };
     this.setState({ selectedVideo: video });
     const _notes = await this.getNotes(video.id.videoId);
-    this.setState({notes:_notes});
+    if(_notes===null){
+      //null handling if video is being played first time should show nothing so dummy note
+      console.log("this is a new video no new rendering should happen here");
+    }else {
+      this.setState({notes: _notes});
+    }
   };
   handleNoteSelect = (note) => {
-    this.setState({selectedNote:note, forceSeekTime:Math.random() });
+    this.setState({selectedNote:note, forceSeekTime:note.startTime });
   };
 
   render() {
-    console.log("AppComponent rendered();");
+    //console.log("AppComponent rendered(); currrentState:" + JSON.stringify(this.state));
     return (
       <div className={makeStyles.root}>
         <Grid container spacing={3}>
