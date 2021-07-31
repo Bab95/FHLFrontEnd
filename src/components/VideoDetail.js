@@ -14,7 +14,7 @@ const hideStyle = {
     display: 'none'
 }
 let startTime = 0;
-const VideoDetail = ({ video, forceSeekTime }) => {
+const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
 //function VideoDetail({video}) {
     if (!video) {
 
@@ -79,12 +79,12 @@ const VideoDetail = ({ video, forceSeekTime }) => {
         console.log("Time::" + minutes + ":" + seconds);
     }
     function _addNotes(event){
-        console.log("dumps::VideoDetail::_addNotes");
         let time = ytplayer.getCurrentTime();
         let minutes = Math.floor(time/60);
         let seconds = time%60;
         showTextArea = true;
         startNoteTime = time;
+        console.log("dumps::VideoDetail::_addNotes:"+startNoteTime);
         //need to hide and make text area visible.....on click this
         //forcererender this component
     }
@@ -127,6 +127,9 @@ const VideoDetail = ({ video, forceSeekTime }) => {
         }catch(error){
             console.log(error.toString());
         }
+        document.getElementById("savebutton").style.display = 'none';
+        document.getElementById("notes-area").value = '';
+        await handleAddNote();
     }
 
     function handleOnChange(event){

@@ -96,9 +96,13 @@ class App extends React.Component {
   handleNoteSelect = (note) => {
     this.setState({selectedNote:note, forceSeekTime:note.startTime });
   };
+  handleAddNote = async () => {
+    const _notes = await this.getNotes(this.state.selectedVideo.id.videoId);
+    this.setState({notes:_notes});
+  }
 
   render() {
-    //console.log("AppComponent rendered(); currrentState:" + JSON.stringify(this.state));
+   console.log("App component rerendered!!");
     return (
       <div className={makeStyles.root}>
         <Grid container spacing={3}>
@@ -118,7 +122,7 @@ class App extends React.Component {
           <Grid item xs={7} style={{ marginLeft: "20px", marginRight: "20px" }}>
             <Paper style={{ padding: "10px" }}>
               {" "}
-              <VideoDetail video={this.state.selectedVideo} forceSeekTime={this.state.forceSeekTime} />
+              <VideoDetail video={this.state.selectedVideo} forceSeekTime={this.state.forceSeekTime} handleAddNote={this.handleAddNote} />
             </Paper>
           </Grid>
           <Grid item xs={4} style={{ marginLeft: "20px", marginRight: "20px" }}>
