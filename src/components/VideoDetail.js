@@ -48,11 +48,9 @@ const VideoDetail = ({ video, forceSeekTime }) => {
 
     }
     if(forceSeekTime) {
-        startTime += forceSeekTime;
-        startTime += 100;
+        startTime = forceSeekTime;
         console.log('ForceSeekTime recieved!!!' + forceSeekTime);
     }
-    const videoSrc = `https://www.youtube.com/embed/${video.id.videoId}`;
     const opts = {
         height: 390,
         width: 640,
@@ -80,14 +78,6 @@ const VideoDetail = ({ video, forceSeekTime }) => {
         let seconds = time%60;
         console.log("Time::" + minutes + ":" + seconds);
     }
-    function _seek(event){
-        let time = document.getElementById("Note1").innerText;
-        let minutes = parseInt(time.split(':')[0]);
-        let seconds = parseInt(time.split(':')[1]);
-        let _seconds = minutes*60 + seconds;
-        console.log(_seconds);
-        ytplayer.seekTo(_seconds, true);
-    }
     function _addNotes(event){
         console.log("dumps::VideoDetail::_addNotes");
         let time = ytplayer.getCurrentTime();
@@ -96,34 +86,7 @@ const VideoDetail = ({ video, forceSeekTime }) => {
         showTextArea = true;
         startNoteTime = time;
         //need to hide and make text area visible.....on click this
-    }
-    const addTodb = async (notesdata) => {
-        let config = {
-            headers: {
-                "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-            }
-        }
-        const response = await axios.post(endpoint + '/items', notesdata, config);
-        if(response.status === 200 || response.status===201){
-            console.log("data added to db");
-        }
-    }
-    const fetchNotes = async () => {
-
-        const {data, status} = await axios.get(endpoint + '/items');
-        if(status === 200){
-            var _notes = document.getElementById("oldNotes").style.display='block';
-            console.log("FETCH DUMPS:::::" + data);
-            let _notesString = '';
-            for(var i=0;i<data.length;i++){
-                console.log(data[i].note);
-                _notesString += data[i].note;
-                _notesString += '\n';
-            }
-        }else{
-            console.log("ERROR in fetching");
-        }
+        //forcererender this component
     }
     async function _saveNotes(event){
         let text = document.getElementById("notes-area").value;
@@ -149,15 +112,6 @@ const VideoDetail = ({ video, forceSeekTime }) => {
                 }
             ]
         };
-        //const notesdatajson = JSON.stringify(notesdata);
-        /*
-        let payload = {
-            "id" : notesdata.id,
-            "starttime" : notesdata.starttime,
-            "duration" : notesdata.duration,
-            "note" : notesdata.note
-        }
-        */
         //add to db here.......
         let config = {
             headers: {
@@ -174,10 +128,7 @@ const VideoDetail = ({ video, forceSeekTime }) => {
             console.log(error.toString());
         }
     }
-    function _forceSeek(){
-        console.log("ForceSeek Called yay!!!");
-        ytplayer.seekTo(startTime, true);
-    }
+
     function handleOnChange(event){
         let savebutton = document.getElementById("savebutton");
         let notes = document.getElementById("notes-area").value;
