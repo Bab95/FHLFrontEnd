@@ -18,8 +18,6 @@ const useStyles = makeStyles((theme) => ({
 const apiEndpoint = "http://localhost:8080";
 
 class App extends React.Component {
-  // const tag = document.createElement("script");
-  // tag.src = "https:www.youtube.com/iframe_api";
 
   state = {
     videos: [],
