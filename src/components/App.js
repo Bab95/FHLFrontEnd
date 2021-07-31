@@ -117,7 +117,7 @@ class App extends React.Component {
               />
             </Paper>
           </Grid>
-          <Grid item xs={4} style={{ marginLeft: "20px", marginRight: "20px" }}>
+          <Grid item xs={7} style={{ marginLeft: "20px", marginRight: "20px" }}>
             <Paper style={{ padding: "10px" }}>
               <NotesList
                   handleNoteSelect={this.handleNoteSelect}
@@ -128,18 +128,6 @@ class App extends React.Component {
 
         </Grid>
       </div>
-
-      // <div className='ui container' style={{marginTop: '1em'}}>
-      //         <SearchBar handleFormSubmit={this.handleSubmit}/>
-      //         <div className='ui grid'>
-      //             <div className="ui row">
-      //                 </div>
-      //                 <VideoDetail video={this.state.selectedVideo} />
-      //                 <div className="five wide column">
-      //                     <VideoList handleVideoSelect={this.handleVideoSelect} videos={this.state.videos}/>
-      //                 </div>
-      //         </div>
-      // </div>
     );
   }
 }
