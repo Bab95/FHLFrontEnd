@@ -18,12 +18,14 @@ const NotesComponent = ({note, handleNoteSelect}) => {
     }
     //console.log("NotesComponent:::" +JSON.stringify(note));
   return(
-      <div className="ui-embed" style={{margin:'1em'}} onClick={() => handleNoteSelect(note)}>
+      <Paper style={{paddingTop:'2px', paddingBottom:'2px',marginTop:'2px'}}>
+        <div className="ui-embed" style={{margin:'1em'}} onClick={() => handleNoteSelect(note)}>
           <p>
             <span style={{cursor:'pointer',color:'Blue'}}>{convertToMinutes(note.startTime)} : </span>
             <span style={{}}>{note.note}</span>
           </p>
-      </div>
+        </div>
+      </Paper>
   );
 }
 export default NotesComponent;
