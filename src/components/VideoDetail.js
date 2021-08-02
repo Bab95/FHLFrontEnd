@@ -72,6 +72,8 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
         let time = ytplayer.getCurrentTime();
         startNoteTime = time;
         //need to hide and make text area visible.....on click this
+        document.getElementById("abc").style.display='block'
+
     }
     async function _saveNotes(event){
         let text = document.getElementById("notes-area").value;
@@ -114,6 +116,7 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
         document.getElementById("savebutton").style.display = 'none';
         document.getElementById("notes-area").value = '';
         alert("Note saved successfully!");
+        document.getElementById("abc").style.display='none'
         await handleAddNote();
     }
 
@@ -138,8 +141,8 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
                     onPlay={onPlayVideo}
                 />
             </div>
-            <div style={{ marginTop: "1em" }}>
-                <Button onClick={_addNotes} variant="contained" color="primary">
+            <div style={{ marginTop: "1em" , marginLeft:'40%'}}>
+                <Button onClick={_addNotes} variant="contained" color="default">
                     Add Notes
                 </Button>
             </div>
@@ -147,7 +150,7 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
                 <h4 className="ui header">{video.snippet.title}</h4>
                 <p>{video.snippet.description}</p>
             </div>
-            <div className="search-bar ui segment" >
+            <div className="search-bar ui segment" id = "abc" style = {{display:'none'}} >
                 <TextField
                     id="notes-area"
                     style={textAreaStyle}
@@ -164,9 +167,9 @@ const VideoDetail = ({ video, forceSeekTime, handleAddNote }) => {
                 color="primary"
                 id="savebutton"
                 onClick={_saveNotes}
-                style={{display:'none'}}
+                style={{display:'none', marginLeft:'42%'}}
             >
-                SaveNotes
+                Save
             </Button>
         </div>
     );

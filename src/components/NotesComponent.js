@@ -1,5 +1,6 @@
 import React from "react";
 import VideoDetail from "./VideoDetail";
+import {Paper} from '@material-ui/core'
 
 const NotesComponent = ({note, handleNoteSelect}) => {
 
@@ -19,8 +20,8 @@ const NotesComponent = ({note, handleNoteSelect}) => {
   return(
       <div className="ui-embed" style={{margin:'1em'}} onClick={() => handleNoteSelect(note)}>
           <p>
-            <span>{convertToMinutes(note.startTime)}::</span>
-            <span>{note.note}</span>
+            <span style={{cursor:'pointer',color:'Blue'}}>{convertToMinutes(note.startTime)} : </span>
+            <span style={{}}>{note.note}</span>
           </p>
       </div>
   );
